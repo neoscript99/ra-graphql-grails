@@ -92,8 +92,8 @@ const buildGetListVariables = introspectionResults => (
                     ...acc,
                     [key]: Array.isArray(params.filter[key])
                         ? params.filter[key].map(value =>
-                              sanitizeValue(type, value)
-                          )
+                            sanitizeValue(type, value)
+                        )
                         : sanitizeValue(type, [params.filter[key]]),
                 };
             }
@@ -104,11 +104,12 @@ const buildGetListVariables = introspectionResults => (
         return { ...acc, [key]: params.filter[key] };
     }, {});
 
+    const { pagination: { page, perPage: max }, sort: { field: sort, order } } = params;
     return {
-        page: parseInt(params.pagination.page) - 1,
-        perPage: parseInt(params.pagination.perPage),
-        sortField: params.sort.field,
-        sortOrder: params.sort.order,
+        offset: (page - 1) * max,
+        max,
+        sort,
+        order,
         filter,
     };
 };
@@ -178,22 +179,17 @@ export default introspectionResults => (
             return {
                 id: params.id,
             };
+        //gorm-graphql的UPDATE和CREATE的入参为INPUT_OBJECT类型，不是属性集
         case UPDATE: {
-            return buildCreateUpdateVariables(introspectionResults)(
-                resource,
-                aorFetchType,
-                params,
-                queryType
-            );
+            return {
+                [queryType.args[0].name]: params.data
+            };
         }
 
         case CREATE: {
-            return buildCreateUpdateVariables(introspectionResults)(
-                resource,
-                aorFetchType,
-                params,
-                queryType
-            );
+            return {
+                [queryType.args[0].name]: params.data
+            };
         }
 
         case DELETE:

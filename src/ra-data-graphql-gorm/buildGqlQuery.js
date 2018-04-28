@@ -100,7 +100,15 @@ export default introspectionResults => (
     variables
 ) => {
     const { sortField, sortOrder, ...metaVariables } = variables;
+    /*graphql总的query variables定义，传入的是数据类型，如
+    query departmentList($max: Int, $offset: Int, $sort: String, $order: String)
+    */
     const apolloArgs = buildApolloArgs(queryType, variables);
+    /*
+    args和metaArgs是单个query的入参，这里是对apolloArgs的引用，如：
+    query departmentList($max: Int, $offset: Int, $sort: String, $order: String) {
+        items: departmentList(max: $max, offset: $offset, sort: $sort, order: $order, ignoreCase: false)
+    */
     const args = buildArgs(queryType, variables);
     const metaArgs = buildArgs(queryType, metaVariables);
     const fields = buildFields(introspectionResults)(resource.type.fields);
@@ -118,9 +126,9 @@ export default introspectionResults => (
                     fields,
                 },
                 total: {
-                    field: `_${queryType.name}Meta`,
-                    params: metaArgs,
-                    fields: { count: {} },
+                    field: queryType.name.replace(/List$/,'Count'),
+                    //params: metaArgs,
+                    //fields: { count: {} },
                 },
             },
         });
