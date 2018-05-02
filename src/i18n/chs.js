@@ -8,7 +8,7 @@ export default {
       fields: {
         name: '部门名',
         seq: '排序号',
-        enables: '启用',
+        enabled: '启用',
       },
       tabs: {
         identity: 'Identity',

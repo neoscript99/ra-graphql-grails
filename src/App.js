@@ -4,7 +4,7 @@ import CircularProgress from 'material-ui/CircularProgress';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import buildDataProvider from './dataProvider';
-import { DepartmentList, DepartmentCreate } from './department';
+import { DepartmentList, DepartmentCreate, DepartmentEdit } from './department';
 import chsMessages from './i18n/chs'
 
 const i18nProvider = locale => {
@@ -39,7 +39,7 @@ class App extends Component {
         i18nProvider={i18nProvider}
         locale="chs"
       >
-        <Resource name="Department" list={DepartmentList} create={DepartmentCreate} />
+        <Resource name="Department" list={DepartmentList} create={DepartmentCreate} edit={DepartmentEdit} />
       </Admin>
     )
   }

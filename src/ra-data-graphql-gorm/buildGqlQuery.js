@@ -19,12 +19,15 @@ export const buildFields = introspectionResults => fields =>
             return { ...acc, [field.name]: {} };
         }
 
-        const linkedResource = introspectionResults.resources.find(
-            r => r.type.name === type.name
-        );
+        //根节点，不做资源连接
+        if (field.name !== 'root') {
+            const linkedResource = introspectionResults.resources.find(
+                r => r.type.name === type.name
+            );
 
-        if (linkedResource) {
-            return { ...acc, [field.name]: { fields: { id: {} } } };
+            if (linkedResource) {
+                return { ...acc, [field.name]: { fields: { id: {} } } };
+            }
         }
 
         const linkedType = introspectionResults.types.find(
@@ -106,12 +109,12 @@ export default introspectionResults => (
     const apolloArgs = buildApolloArgs(queryType, variables);
     /*
     args和metaArgs是单个query的入参，这里是对apolloArgs的引用，如：
-    query departmentList($max: Int, $offset: Int, $sort: String, $order: String) {
-        items: departmentList(max: $max, offset: $offset, sort: $sort, order: $order, ignoreCase: false)
+    items: departmentList(max: $max, offset: $offset, sort: $sort, order: $order, ignoreCase: false)
     */
     const args = buildArgs(queryType, variables);
     const metaArgs = buildArgs(queryType, metaVariables);
-    const fields = buildFields(introspectionResults)(resource.type.fields);
+    //优化graphql返回值fields获取方式： 通过queryType.type， 不再通过resource.type
+    const fields = buildFields(introspectionResults)([{ name: 'root', type: queryType.type }]).root.fields;
     if (
         aorFetchType === GET_LIST ||
         aorFetchType === GET_MANY ||
@@ -126,7 +129,7 @@ export default introspectionResults => (
                     fields,
                 },
                 total: {
-                    field: queryType.name.replace(/List$/,'Count'),
+                    field: queryType.name.replace(/List$/, 'Count'),
                     //params: metaArgs,
                     //fields: { count: {} },
                 },
@@ -136,6 +139,8 @@ export default introspectionResults => (
         return result;
     }
 
+    /*graphql返回值fields获取方式优化后，
+    gorm的delete不需要特殊处理，返回success: Boolean!, error: String
     if (aorFetchType === DELETE) {
         return encodeMutation(queryType.name, {
             params: apolloArgs,
@@ -148,6 +153,7 @@ export default introspectionResults => (
             },
         });
     }
+    */
 
     const query = {
         params: apolloArgs,

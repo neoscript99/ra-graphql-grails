@@ -1,5 +1,5 @@
 import { TypeKind } from 'graphql';
-import { GET_LIST, GET_MANY, GET_MANY_REFERENCE } from 'react-admin';
+import { GET_LIST, GET_MANY, GET_MANY_REFERENCE, DELETE } from 'react-admin';
 import getFinalType from './getFinalType';
 
 const sanitizeResource = (introspectionResults, resource) => data => {
@@ -41,8 +41,8 @@ const sanitizeResource = (introspectionResults, resource) => data => {
                     : undefined,
                 [field.name]: linkedResourceData
                     ? sanitizeResource(introspectionResults, linkedResource)(
-                          data[field.name]
-                      )
+                        data[field.name]
+                    )
                     : undefined,
             };
         }
@@ -67,6 +67,8 @@ export default introspectionResults => (aorFetchType, resource) => response => {
             total: response.data.total,
         };
     }
-
-    return { data: sanitize(data.data) };
+    else if (aorFetchType === DELETE)
+        return data.data;
+    else
+        return { data: sanitize(data.data) };
 };

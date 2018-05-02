@@ -181,8 +181,10 @@ export default introspectionResults => (
             };
         //gorm-graphql的UPDATE和CREATE的入参为INPUT_OBJECT类型，不是属性集
         case UPDATE: {
+            const { id, errors, ...rest } = params.data;
             return {
-                [queryType.args[0].name]: params.data
+                id: id,
+                [queryType.args[1].name]: rest
             };
         }
 
