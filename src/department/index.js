@@ -2,35 +2,38 @@ import React from 'react';
 import {
     required, Datagrid, List, TextField, Create,
     SimpleForm, NumberInput, TextInput, BooleanInput,
-    EditButton, Edit
+    EditButton, Edit, BooleanField
 } from 'react-admin';
-export const DepartmentList = props => (
+
+const DepartmentList = props => (
     <List {...props} sort={{ field: 'seq', order: 'ASC' }}>
         <Datagrid>
             <TextField source="name" />
             <TextField source="seq" />
+            <BooleanField source="enabled" />
             <EditButton />
         </Datagrid>
     </List>
 );
 
 
-export const DepartmentCreate = (props) => (
+const DepartmentForm = (props) => (
+    <SimpleForm {...props} redirect="list">
+        <TextInput source="name" validate={required()} />
+        <NumberInput source="seq" validate={required()} />
+        <BooleanInput source="enabled" defaultValue="true" />
+    </SimpleForm>
+);
+
+const DepartmentCreate = (props) => (
     <Create {...props}>
-        <SimpleForm>
-            <TextInput source="name" validate={required()} />
-            <NumberInput source="seq" validate={required()} />
-            <BooleanInput source="enabled" defaultValue="true" />
-        </SimpleForm>
+        <DepartmentForm />
     </Create>
 );
 
-export const DepartmentEdit = props => (
+const DepartmentEdit = props => (
     <Edit {...props}>
-        <SimpleForm>
-            <TextInput source="name" validate={required()} />
-            <NumberInput source="seq" validate={required()} />
-            <BooleanInput source="enabled" defaultValue="true" />
-        </SimpleForm>
+        <DepartmentForm />
     </Edit>
 );
+export default { name: 'Department', list: DepartmentList, create: DepartmentCreate, edit: DepartmentEdit };

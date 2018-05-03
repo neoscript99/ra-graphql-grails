@@ -4,8 +4,8 @@ import CircularProgress from 'material-ui/CircularProgress';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import buildDataProvider from './dataProvider';
-import { DepartmentList, DepartmentCreate, DepartmentEdit } from './department';
-import chsMessages from './i18n/chs'
+import chsMessages from './i18n/chs';
+import department from './department';
 
 const i18nProvider = locale => {
   if (locale === 'en') {
@@ -13,6 +13,13 @@ const i18nProvider = locale => {
   }
   return chsMessages;
 };
+
+const authProvider = (type, params) => {
+  // type can be any of AUTH_LOGIN, AUTH_LOGOUT, AUTH_ERROR, and AUTH_CHECK
+  // ...
+  return Promise.resolve();
+};
+const resources = [department]
 
 class App extends Component {
   state = { dataProvider: null };
@@ -37,9 +44,15 @@ class App extends Component {
         title="React Admin & GORM-GraphQl"
         dataProvider={dataProvider}
         i18nProvider={i18nProvider}
+        authProvider={authProvider}
         locale="chs"
       >
-        <Resource name="Department" list={DepartmentList} create={DepartmentCreate} edit={DepartmentEdit} />
+        {
+          resources.map(res => 
+            <Resource key={res.name} name={res.name} list={res.list} create={res.create} edit={res.edit} />
+          )
+        }
+
       </Admin>
     )
   }

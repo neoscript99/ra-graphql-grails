@@ -63,12 +63,16 @@ export default introspectionResults => (aorFetchType, resource) => response => {
         aorFetchType === GET_MANY_REFERENCE
     ) {
         return {
-            data: response.data.items.map(sanitize),
-            total: response.data.total,
+            data: data.items.map(sanitize),
+            total: data.total,
         };
     }
-    else if (aorFetchType === DELETE)
-        return data.data;
+    else if (aorFetchType === DELETE) {
+        if (data.data.success === true)
+            return data;
+        else
+            throw new Error(data.data.error)
+    }
     else
         return { data: sanitize(data.data) };
 };
