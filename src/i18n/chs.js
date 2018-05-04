@@ -20,6 +20,16 @@ export default {
       page: {
         delete: 'Delete Customer',
       },
+    },
+    User: {
+      name: '用户',
+      fields: {
+        account:'账号',
+        name: '名称',
+        editable: '可编辑',
+        enabled: '启用',
+        "dept.name": '所属部门',
+      },
     }
   }
 }

@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Admin, Resource } from 'react-admin';
-import CircularProgress from 'material-ui/CircularProgress';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import { CircularProgress } from 'material-ui';
+import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 
 import buildDataProvider from './dataProvider';
 import chsMessages from './i18n/chs';
-import department from './department';
+import resources from './resources'
 
 const i18nProvider = locale => {
   if (locale === 'en') {
@@ -19,8 +19,12 @@ const authProvider = (type, params) => {
   // ...
   return Promise.resolve();
 };
-const resources = [department]
 
+const theme = createMuiTheme({
+  palette: {
+    type: 'light',
+  },
+});
 class App extends Component {
   state = { dataProvider: null };
 
@@ -34,7 +38,7 @@ class App extends Component {
 
     if (!dataProvider) {
       return (
-        <MuiThemeProvider>
+        <MuiThemeProvider theme={theme}>
           <CircularProgress size={60} thickness={7} />
         </MuiThemeProvider>);
     }
@@ -46,10 +50,11 @@ class App extends Component {
         i18nProvider={i18nProvider}
         authProvider={authProvider}
         locale="chs"
+        theme={theme}
       >
         {
-          resources.map(res => 
-            <Resource key={res.name} name={res.name} list={res.list} create={res.create} edit={res.edit} />
+          resources.map(res =>
+            <Resource {...res} />
           )
         }
 

@@ -4,6 +4,7 @@ import {
     SimpleForm, NumberInput, TextInput, BooleanInput,
     EditButton, Edit, BooleanField
 } from 'react-admin';
+import GroupIcon from '@material-ui/icons/Group'
 
 const DepartmentList = props => (
     <List {...props} sort={{ field: 'seq', order: 'ASC' }}>
@@ -36,4 +37,4 @@ const DepartmentEdit = props => (
         <DepartmentForm />
     </Edit>
 );
-export default { name: 'Department', list: DepartmentList, create: DepartmentCreate, edit: DepartmentEdit };
+export default { key: 'Department', name: 'Department', list: DepartmentList, create: DepartmentCreate, edit: DepartmentEdit, icon: GroupIcon };

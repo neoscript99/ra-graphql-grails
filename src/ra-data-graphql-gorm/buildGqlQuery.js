@@ -19,16 +19,16 @@ export const buildFields = introspectionResults => fields =>
             return { ...acc, [field.name]: {} };
         }
 
-        //根节点，不做资源连接
-        if (field.name !== 'root') {
-            const linkedResource = introspectionResults.resources.find(
-                r => r.type.name === type.name
-            );
+        //不做资源连接，通过linkedType获取完整对象
+        /*
+        const linkedResource = introspectionResults.resources.find(
+            r => r.type.name === type.name
+        );
 
-            if (linkedResource) {
-                return { ...acc, [field.name]: { fields: { id: {} } } };
-            }
+        if (linkedResource) {
+            return { ...acc, [field.name]: { fields: { id: {} } } };
         }
+        */
 
         const linkedType = introspectionResults.types.find(
             t => t.name === type.name
