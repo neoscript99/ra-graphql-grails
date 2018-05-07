@@ -2,9 +2,11 @@ import React from 'react';
 import {
     required, Datagrid, List, TextField, Create,
     SimpleForm, NumberInput, TextInput, BooleanInput,
-    EditButton, Edit, BooleanField, ReferenceField
+    EditButton, Edit, BooleanField, ReferenceField,DeleteButton
 } from 'react-admin';
 import PersonIcon from '@material-ui/icons/Person'
+
+import VisibleUI from '../../components/VisibleUI'
 
 const UserList = props => (
     <List {...props}>
@@ -14,7 +16,10 @@ const UserList = props => (
             <BooleanField source="editable" />
             <BooleanField source="enabled" />
             <TextField source="dept.name" />
-            <EditButton />
+            <VisibleUI source="enabled">
+                <EditButton />
+                <DeleteButton />
+            </VisibleUI>
         </Datagrid>
     </List>
 );
