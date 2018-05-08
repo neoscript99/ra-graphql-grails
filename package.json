@@ -12,13 +12,13 @@
     "react": "^16.3.2",
     "react-admin": "^2.0.0-RC2",
     "react-dom": "^16.3.2",
-    "react-scripts": "1.1.4",
-    "underscore.string": "^3.3.4"
+    "react-scripts": "1.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
+    "test:debug": "react-scripts --inspect-brk test --runInBand --env=jsdom",
     "eject": "react-scripts eject"
   },
   "proxy": {
@@ -26,5 +26,27 @@
       "target": "http://localhost:8080/",
       "changeOrigin": true
     }
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/__tests__/*.spec.js",
+      "!<rootDir>/node_modules/",
+      "!<rootDir>/src/ra-data-graphql-gorm"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "functions": 90,
+        "lines": 90,
+        "statements": 90
+      }
+    },
+    "coverageReporters": ["text"]
+  },
+  "devDependencies": {
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "jest-enzyme": "^6.0.0",
+    "react-test-renderer": "^16.3.2"
   }
 }

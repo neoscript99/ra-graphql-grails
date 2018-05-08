@@ -1,7 +1,7 @@
 import React from 'react';
 import get from 'lodash/get';
 
-const VisibleUI = ({ source, children, label, record = {}, ...rest }) => {
+const VisibleWrapper = ({ source, children, label, record = {}, ...rest }) => {
   if (get(record, source))
     return React.Children.map(
       children,
@@ -15,8 +15,8 @@ const VisibleUI = ({ source, children, label, record = {}, ...rest }) => {
     return null;
 };
 
-VisibleUI.defaultProps = {
+VisibleWrapper.defaultProps = {
   label: ' ',
 };
 
-export default VisibleUI;
+export default VisibleWrapper;

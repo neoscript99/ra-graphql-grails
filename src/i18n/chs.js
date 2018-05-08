@@ -22,7 +22,7 @@ export default {
       },
     },
     User: {
-      name: '用户',
+      name: '用户 |||| 用户',
       fields: {
         account:'账号',
         name: '名称',

@@ -2,11 +2,12 @@ import React from 'react';
 import {
     required, Datagrid, List, TextField, Create,
     SimpleForm, NumberInput, TextInput, BooleanInput,
-    EditButton, Edit, BooleanField, ReferenceField,DeleteButton
+    EditButton, Edit, BooleanField, ReferenceField, DeleteButton,
+    ReferenceInput, SelectInput
 } from 'react-admin';
 import PersonIcon from '@material-ui/icons/Person'
 
-import VisibleUI from '../../components/VisibleUI'
+import VisibleWrapper from '../../components/VisibleWrapper'
 
 const UserList = props => (
     <List {...props}>
@@ -16,10 +17,10 @@ const UserList = props => (
             <BooleanField source="editable" />
             <BooleanField source="enabled" />
             <TextField source="dept.name" />
-            <VisibleUI source="enabled">
+            <VisibleWrapper source="editable">
                 <EditButton />
                 <DeleteButton />
-            </VisibleUI>
+            </VisibleWrapper>
         </Datagrid>
     </List>
 );
@@ -31,6 +32,10 @@ const UserForm = (props) => (
         <TextInput source="name" validate={required()} />
         <BooleanInput source="editable" defaultValue="true" />
         <BooleanInput source="enabled" defaultValue="true" />
+        <ReferenceInput label="resources.User.fields.dept.name" source="dept.id" reference="Department"
+            sort={{ field: 'name', order: 'ASC' }} perPage={100}>
+            <SelectInput optionText="name" />
+        </ReferenceInput>
     </SimpleForm>
 );
 

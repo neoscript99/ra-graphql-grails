@@ -1,6 +1,6 @@
 import merge from 'lodash/merge';
+import lowerFirst from 'lodash/lowerFirst'
 import buildDataProvider from 'ra-data-graphql';
-import { decapitalize } from 'underscore.string'
 import buildQuery from './buildQuery';
 import {
     GET_LIST,
@@ -16,7 +16,7 @@ import {
 
 
 function decapAndAppend(type, append) {
-    const decapName = decapitalize(type.name)
+    const decapName = lowerFirst(type.name)
     return append ? decapName + append : decapName;
 }
 /*
