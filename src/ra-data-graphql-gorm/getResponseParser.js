@@ -57,8 +57,8 @@ export default introspectionResults => (aorFetchType, resource) => response => {
     const sanitize = sanitizeResource(introspectionResults, resource);
     const data = response.data;
     //gorm错误信息处理
-    if (data.data && data.data.errors)
-        throw new Error(data.data.errors)
+    if (data.data && data.data.errors && data.data.errors.length)
+        throw new Error(data.data.errors.map(e => e.message))
 
     if (
         aorFetchType === GET_LIST ||

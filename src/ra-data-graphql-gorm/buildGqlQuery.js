@@ -6,9 +6,13 @@ import { encodeQuery, encodeMutation } from './graphqlify';
 import getFinalType from './getFinalType';
 import isList from './isList';
 import isRequired from './isRequired';
-
-export const buildFields = introspectionResults => fields =>
+const rootKey = 'root____';
+export const buildFields = (introspectionResults, level = 0) => fields =>
     fields.reduce((acc, field) => {
+        //默认不做1对多的连接
+        if (field.name !== rootKey && field.type.kind === TypeKind.LIST)
+            return acc;
+
         const type = getFinalType(field.type);
 
         if (type.name.startsWith('_')) {
@@ -34,11 +38,12 @@ export const buildFields = introspectionResults => fields =>
             t => t.name === type.name
         );
 
-        if (linkedType) {
+        //限制2层的属性嵌套，防止死循环
+        if (linkedType && level <= 2) {
             return {
                 ...acc,
                 [field.name]: {
-                    fields: buildFields(introspectionResults)(
+                    fields: buildFields(introspectionResults, level + 1)(
                         linkedType.fields
                     ),
                 },
@@ -114,7 +119,7 @@ export default introspectionResults => (
     const args = buildArgs(queryType, variables);
     const metaArgs = buildArgs(queryType, metaVariables);
     //优化graphql返回值fields获取方式： 通过queryType.type， 不再通过resource.type
-    const fields = buildFields(introspectionResults)([{ name: 'root', type: queryType.type }]).root.fields;
+    const fields = buildFields(introspectionResults)([{ name: rootKey, type: queryType.type }])[rootKey].fields;
     if (
         aorFetchType === GET_LIST ||
         aorFetchType === GET_MANY ||

@@ -6,6 +6,9 @@ import {
     ReferenceInput, SelectInput
 } from 'react-admin';
 import PersonIcon from '@material-ui/icons/Person'
+import { connect } from 'react-redux';
+import { dispatch } from 'redux';
+import { crudGetList } from 'react-admin'
 
 import VisibleWrapper from '../../components/VisibleWrapper'
 
@@ -25,6 +28,17 @@ const UserList = props => (
     </List>
 );
 
+const DeptSelectInput = connect((state, props) => {
+    const { data, list } = state.admin.resources.Department;
+    if (list.ids && list.ids.length > 0) {
+        const choices = list.ids.map(id => data[id])
+        return { ...props, choices }
+    }
+    else {
+        dispatch(crudGetList('Department'))
+        return props;
+    }
+})(SelectInput);
 
 const UserForm = (props) => (
     <SimpleForm {...props} redirect="list">
@@ -32,10 +46,7 @@ const UserForm = (props) => (
         <TextInput source="name" validate={required()} />
         <BooleanInput source="editable" defaultValue="true" />
         <BooleanInput source="enabled" defaultValue="true" />
-        <ReferenceInput label="resources.User.fields.dept.name" source="dept.id" reference="Department"
-            sort={{ field: 'name', order: 'ASC' }} perPage={100}>
-            <SelectInput optionText="name" />
-        </ReferenceInput>
+        <DeptSelectInput source="dept.id" optionText="name" optionValue="id" />
     </SimpleForm>
 );
 

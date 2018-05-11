@@ -29,7 +29,7 @@
   },
   "jest": {
     "collectCoverageFrom": [
-      "src/__tests__/*.spec.js",
+      "!<rootDir>/src/__tests__/*.spec.js",
       "!<rootDir>/node_modules/",
       "!<rootDir>/src/ra-data-graphql-gorm"
     ],

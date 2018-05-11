@@ -28,7 +28,7 @@ export default {
         name: '名称',
         editable: '可编辑',
         enabled: '启用',
-        "dept.name": '所属部门',
+        "dept.id": '所属部门',
       },
     }
   }
