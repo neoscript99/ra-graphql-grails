@@ -13,7 +13,7 @@ import { crudGetList } from 'react-admin'
 import VisibleWrapper from '../../components/VisibleWrapper'
 
 const UserList = props => (
-    <List {...props}>
+    <List {...props} bulkActions={false}>
         <Datagrid>
             <TextField source="account" />
             <TextField source="name" />
@@ -30,14 +30,8 @@ const UserList = props => (
 
 const DeptSelectInput = connect((state, props) => {
     const { data, list } = state.admin.resources.Department;
-    if (list.ids && list.ids.length > 0) {
-        const choices = list.ids.map(id => data[id])
-        return { ...props, choices }
-    }
-    else {
-        dispatch(crudGetList('Department'))
-        return props;
-    }
+    const choices = list.ids.map(id => data[id])
+    return { ...props, choices }
 })(SelectInput);
 
 const UserForm = (props) => (

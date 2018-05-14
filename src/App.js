@@ -6,6 +6,7 @@ import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 import buildDataProvider from './dataProvider';
 import chsMessages from './i18n/chs';
 import resources from './resources'
+import initDictList from './sagas/initDictList'
 
 const i18nProvider = locale => {
   if (locale === 'en') {
@@ -49,6 +50,7 @@ class App extends Component {
         dataProvider={dataProvider}
         i18nProvider={i18nProvider}
         authProvider={authProvider}
+        customSagas={[initDictList]}
         locale="chs"
         theme={theme}
       >

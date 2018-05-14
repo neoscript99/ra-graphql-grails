@@ -7,7 +7,7 @@ import {
 import GroupIcon from '@material-ui/icons/Group'
 
 const DepartmentList = props => (
-    <List {...props} sort={{ field: 'seq', order: 'ASC' }}>
+    <List {...props} sort={{ field: 'seq', order: 'ASC' }} bulkActions={false}>
         <Datagrid>
             <TextField source="name" />
             <TextField source="seq" />
