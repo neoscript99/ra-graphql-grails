@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Admin, Resource } from 'react-admin';
-import { CircularProgress } from 'material-ui';
-import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
+import { CircularProgress, MuiThemeProvider, createMuiTheme } from '@material-ui/core';
 
 import buildDataProvider from './dataProvider';
 import chsMessages from './i18n/chs';
