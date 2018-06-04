@@ -87,14 +87,7 @@ export default options => {
                     return { data };
                 });
             }
-            //gorm暂不支持GET_MANY {filter: { ids: params.ids }}
-            if (fetchType === GET_MANY)
-                return Promise.all(
-                    params.ids.map(id => defaultDataProvider(GET_ONE, resource, { id }))
-                ).then(values => {
-                    return { data: values.map(v => v.data) }
-                })
-                
+
             return defaultDataProvider(fetchType, resource, params);
         };
     });

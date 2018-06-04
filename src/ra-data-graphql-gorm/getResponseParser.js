@@ -41,8 +41,8 @@ const sanitizeResource = (introspectionResults, resource) => data => {
                     : undefined,
                 [field.name]: linkedResourceData
                     ? sanitizeResource(introspectionResults, linkedResource)(
-                        data[field.name]
-                    )
+                          data[field.name]
+                      )
                     : undefined,
             };
         }
@@ -66,8 +66,8 @@ export default introspectionResults => (aorFetchType, resource) => response => {
         aorFetchType === GET_MANY_REFERENCE
     ) {
         return {
-            data: data.items.map(sanitize),
-            total: data.total,
+            data: data.data.results.map(sanitize),
+            total: data.data.totalCount,
         };
     }
     else if (aorFetchType === DELETE) {

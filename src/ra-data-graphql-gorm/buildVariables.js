@@ -28,90 +28,23 @@ const buildGetListVariables = introspectionResults => (
     aorFetchType,
     params
 ) => {
-    const filter = Object.keys(params.filter).reduce((acc, key) => {
-        if (key === 'ids') {
-            return { ...acc, ids: params.filter[key] };
-        }
+    //将filter转化为gorm构建DetachedCriteria的closure
+    const eqs = [];
+    const criteria = { eq: eqs };
+    
+    Object.keys(params.filter).forEach((key) => {
+        eqs.push([key, params.filter[key]]);
+    });
 
-        if (typeof params.filter[key] === 'object') {
-            const type = introspectionResults.types.find(
-                t => t.name === `${resource.type.name}Filter`
-            );
-            const filterSome = type.inputFields.find(
-                t => t.name === `${key}_some`
-            );
+    const { pagination: { page, perPage }, sort: { field, order } } = params;
+    if (perPage) {
+        criteria.max = perPage;
+        criteria.offset = (page > 0 ? page - 1 : 0) * perPage;
+    }
+    if (field)
+        criteria.order = [[field, order]];
 
-            if (filterSome) {
-                const filter = Object.keys(params.filter[key]).reduce(
-                    (acc, k) => ({
-                        ...acc,
-                        [`${k}_in`]: params.filter[key][k],
-                    }),
-                    {}
-                );
-                return { ...acc, [`${key}_some`]: filter };
-            }
-        }
-
-        const parts = key.split('.');
-
-        if (parts.length > 1) {
-            if (parts[1] == 'id') {
-                const type = introspectionResults.types.find(
-                    t => t.name === `${resource.type.name}Filter`
-                );
-                const filterSome = type.inputFields.find(
-                    t => t.name === `${parts[0]}_some`
-                );
-
-                if (filterSome) {
-                    return {
-                        ...acc,
-                        [`${parts[0]}_some`]: { id: params.filter[key] },
-                    };
-                }
-
-                return { ...acc, [parts[0]]: { id: params.filter[key] } };
-            }
-
-            const resourceField = resource.type.fields.find(
-                f => f.name === parts[0]
-            );
-            const type = getFinalType(resourceField.type);
-            return { ...acc, [key]: sanitizeValue(type, params.filter[key]) };
-        }
-
-        const resourceField = resource.type.fields.find(f => f.name === key);
-
-        if (resourceField) {
-            const type = getFinalType(resourceField.type);
-            const isAList = isList(resourceField.type);
-
-            if (isAList) {
-                return {
-                    ...acc,
-                    [key]: Array.isArray(params.filter[key])
-                        ? params.filter[key].map(value =>
-                            sanitizeValue(type, value)
-                        )
-                        : sanitizeValue(type, [params.filter[key]]),
-                };
-            }
-
-            return { ...acc, [key]: sanitizeValue(type, params.filter[key]) };
-        }
-
-        return { ...acc, [key]: params.filter[key] };
-    }, {});
-
-    const { pagination: { page, perPage: max }, sort: { field: sort, order } } = params;
-    return {
-        offset: (page - 1) * max,
-        max,
-        sort,
-        order,
-        filter,
-    };
+    return { criteria: JSON.stringify(criteria) };
 };
 
 const buildCreateUpdateVariables = () => (

@@ -10,7 +10,7 @@ const rootKey = 'root____';
 export const buildFields = (introspectionResults, level = 0) => fields =>
     fields.reduce((acc, field) => {
         //默认不做1对多的连接
-        if (field.name !== rootKey && field.type.kind === TypeKind.LIST)
+        if (level>1 && field.type.kind === TypeKind.LIST)
             return acc;
 
         const type = getFinalType(field.type);
@@ -38,8 +38,8 @@ export const buildFields = (introspectionResults, level = 0) => fields =>
             t => t.name === type.name
         );
 
-        //限制2层的属性嵌套，防止死循环
-        if (linkedType && level <= 2) {
+        //限制3层的属性嵌套，防止死循环
+        if (linkedType && level <= 3) {
             return {
                 ...acc,
                 [field.name]: {
@@ -120,6 +120,10 @@ export default introspectionResults => (
     const metaArgs = buildArgs(queryType, metaVariables);
     //优化graphql返回值fields获取方式： 通过queryType.type， 不再通过resource.type
     const fields = buildFields(introspectionResults)([{ name: rootKey, type: queryType.type }])[rootKey].fields;
+
+
+    /*graphql返回值fields获取方式优化后，
+    gorm的GET_LIST不需要特殊处理，返回 results, totalCount
     if (
         aorFetchType === GET_LIST ||
         aorFetchType === GET_MANY ||
@@ -142,7 +146,7 @@ export default introspectionResults => (
         });
 
         return result;
-    }
+    }*/
 
     /*graphql返回值fields获取方式优化后，
     gorm的delete不需要特殊处理，返回success: Boolean!, error: String

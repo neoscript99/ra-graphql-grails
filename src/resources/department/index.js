@@ -2,12 +2,21 @@ import React from 'react';
 import {
     required, Datagrid, List, TextField, Create,
     SimpleForm, NumberInput, TextInput, BooleanInput,
-    EditButton, Edit, BooleanField
+    EditButton, Edit, BooleanField, Filter, NullableBooleanInput
 } from 'react-admin';
 import GroupIcon from '@material-ui/icons/Group'
 
+const DepartmentFilter = props => (
+    <Filter {...props}>
+        <NullableBooleanInput source="enabled" defaultValue />
+    </Filter>
+);
+
 const DepartmentList = props => (
-    <List {...props} sort={{ field: 'seq', order: 'ASC' }} bulkActions={false}>
+    <List {...props}
+        sort={{ field: 'seq', order: 'ASC' }}
+        bulkActions={false}
+        filters={<DepartmentFilter />}>
         <Datagrid>
             <TextField source="name" />
             <TextField source="seq" />
