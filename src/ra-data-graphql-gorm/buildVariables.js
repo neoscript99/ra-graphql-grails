@@ -7,7 +7,7 @@ import {
     UPDATE,
     DELETE,
 } from 'react-admin';
-
+import { TypeKind } from 'graphql';
 import getFinalType from './getFinalType';
 import isList from './isList';
 
@@ -23,18 +23,31 @@ const sanitizeValue = (type, value) => {
     return value;
 };
 
-const buildGetListVariables = introspectionResults => (
+//将filter转化为gorm构建DetachedCriteria的closure
+//传入的filter为{ eq: { enabled: true, seq: 1 }, like: { name: "aa%" } , dept: { eq: {id: 'aa'}}}
+//转化为{ eq: [["enabled", true], ["seq", 1]], like: [["name", "aa%"]], dept: { eq: [['id','aa']]} }
+//暂时不支持defaultValue，因为传入的filter为{"eq.enabled":true},ra-ui-materialui的FilterForm设置初始值有问题
+const toCriteria = (source) => {
+    const keys = Object.keys(source);
+    //判断是否嵌套属性
+    if (keys.length === 0 || keys.some(key => ((typeof source[key]) === 'object')))
+        return keys.reduce((acc, key) => {
+            acc[key] = toCriteria(source[key]);
+            return acc;
+        }, {});
+    else
+        return keys.reduce((acc, key) => {
+            acc.push([key, source[key]]);
+            return acc;
+        }, []);
+}
+
+const buildGetListVariables = () => (
     resource,
     aorFetchType,
     params
 ) => {
-    //将filter转化为gorm构建DetachedCriteria的closure
-    const eqs = [];
-    const criteria = { eq: eqs };
-    
-    Object.keys(params.filter).forEach((key) => {
-        eqs.push([key, params.filter[key]]);
-    });
+    const criteria = toCriteria(params.filter);
 
     const { pagination: { page, perPage }, sort: { field, order } } = params;
     if (perPage) {
@@ -47,40 +60,18 @@ const buildGetListVariables = introspectionResults => (
     return { criteria: JSON.stringify(criteria) };
 };
 
-const buildCreateUpdateVariables = () => (
-    resource,
-    aorFetchType,
-    params,
-    queryType
-) =>
-    Object.keys(params.data).reduce((acc, key) => {
-        if (Array.isArray(params.data[key])) {
-            const arg = queryType.args.find(a => a.name === `${key}Ids`);
-
-            if (arg) {
-                return {
-                    ...acc,
-                    [`${key}Ids`]: params.data[key].map(({ id }) => id),
-                };
-            }
-        }
-
-        if (typeof params.data[key] === 'object') {
-            const arg = queryType.args.find(a => a.name === `${key}Id`);
-
-            if (arg) {
-                return {
-                    ...acc,
-                    [`${key}Id`]: params.data[key].id,
-                };
-            }
-        }
-
-        return {
-            ...acc,
-            [key]: params.data[key],
-        };
-    }, {});
+const sanitizeInputObject = introspectionResults =>
+    (inputTypeName, inputObject) => {
+        const type = introspectionResults.types.find(
+            t => t.name === inputTypeName
+        );
+        return type.inputFields.reduce((acc, field) => {
+            acc[field.name] = (field.type.kind === TypeKind.INPUT_OBJECT) ?
+                sanitizeInputObject(introspectionResults)(field.type.name, inputObject[field.name]) :
+                inputObject[field.name];
+            return acc;
+        }, {});
+    };
 
 export default introspectionResults => (
     resource,
@@ -113,17 +104,18 @@ export default introspectionResults => (
                 id: params.id,
             };
         //gorm-graphql的UPDATE和CREATE的入参为INPUT_OBJECT类型，不是属性集
+        //通过sanitizeInputObject过滤无用属性，否则服务器报错
         case UPDATE: {
             const { id, errors, ...rest } = params.data;
             return {
                 id: id,
-                [queryType.args[1].name]: rest
+                [queryType.args[1].name]: sanitizeInputObject(introspectionResults)(queryType.args[1].type.name, rest)
             };
         }
 
         case CREATE: {
             return {
-                [queryType.args[0].name]: params.data
+                [queryType.args[0].name]: sanitizeInputObject(introspectionResults)(queryType.args[0].type.name, params.data)
             };
         }
 

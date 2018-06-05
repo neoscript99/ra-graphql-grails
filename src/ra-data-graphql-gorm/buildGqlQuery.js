@@ -117,51 +117,15 @@ export default introspectionResults => (
     items: departmentList(max: $max, offset: $offset, sort: $sort, order: $order, ignoreCase: false)
     */
     const args = buildArgs(queryType, variables);
-    const metaArgs = buildArgs(queryType, metaVariables);
+    //const metaArgs = buildArgs(queryType, metaVariables);
     //优化graphql返回值fields获取方式： 通过queryType.type， 不再通过resource.type
     const fields = buildFields(introspectionResults)([{ name: rootKey, type: queryType.type }])[rootKey].fields;
 
 
-    /*graphql返回值fields获取方式优化后，
+    /*
+    graphql返回值fields获取方式优化后，
     gorm的GET_LIST不需要特殊处理，返回 results, totalCount
-    if (
-        aorFetchType === GET_LIST ||
-        aorFetchType === GET_MANY ||
-        aorFetchType === GET_MANY_REFERENCE
-    ) {
-        const result = encodeQuery(queryType.name, {
-            params: apolloArgs,
-            fields: {
-                items: {
-                    field: queryType.name,
-                    params: args,
-                    fields,
-                },
-                total: {
-                    field: queryType.name.replace(/List$/, 'Count'),
-                    //params: metaArgs,
-                    //fields: { count: {} },
-                },
-            },
-        });
-
-        return result;
-    }*/
-
-    /*graphql返回值fields获取方式优化后，
     gorm的delete不需要特殊处理，返回success: Boolean!, error: String
-    if (aorFetchType === DELETE) {
-        return encodeMutation(queryType.name, {
-            params: apolloArgs,
-            fields: {
-                data: {
-                    field: queryType.name,
-                    params: args,
-                    fields: { id: {} },
-                },
-            },
-        });
-    }
     */
 
     const query = {

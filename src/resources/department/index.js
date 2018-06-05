@@ -1,14 +1,16 @@
 import React from 'react';
 import {
     required, Datagrid, List, TextField, Create,
-    SimpleForm, NumberInput, TextInput, BooleanInput,
+    SimpleForm, NumberInput, TextInput, BooleanInput, DateInput,
     EditButton, Edit, BooleanField, Filter, NullableBooleanInput
 } from 'react-admin';
 import GroupIcon from '@material-ui/icons/Group'
 
 const DepartmentFilter = props => (
     <Filter {...props}>
-        <NullableBooleanInput source="enabled" defaultValue />
+        <TextInput label="部门名" source="like.name" alwaysOn />
+        <NullableBooleanInput label="是否启用" source="eq.enabled"/>
+        <TextInput label="排序号" source="ge.seq" />
     </Filter>
 );
 
