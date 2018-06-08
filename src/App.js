@@ -3,21 +3,16 @@ import { Admin, Resource } from 'react-admin';
 import { CircularProgress, MuiThemeProvider, createMuiTheme } from '@material-ui/core';
 
 import buildDataProvider from './dataProvider';
+import authProvider from './authProvider';
 import chsMessages from './i18n/chs';
 import resources from './resources'
-import initDictList from './sagas/initDictList'
+import afterLoginSaga from './sagas/afterLoginSaga'
 
 const i18nProvider = locale => {
   if (locale === 'en') {
     return import('./i18n/en').then(messages => messages.default);
   }
   return chsMessages;
-};
-
-const authProvider = (type, params) => {
-  // type can be any of AUTH_LOGIN, AUTH_LOGOUT, AUTH_ERROR, and AUTH_CHECK
-  // ...
-  return Promise.resolve();
 };
 
 const theme = createMuiTheme({
@@ -49,7 +44,7 @@ class App extends Component {
         dataProvider={dataProvider}
         i18nProvider={i18nProvider}
         authProvider={authProvider}
-        customSagas={[initDictList]}
+        customSagas={[afterLoginSaga]}
         locale="chs"
         theme={theme}
       >

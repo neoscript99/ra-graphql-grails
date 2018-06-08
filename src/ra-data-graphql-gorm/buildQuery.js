@@ -49,7 +49,7 @@ export const buildQueryFactory = (
             resource,
             queryType
         );
-
+        variables.token = localStorage.getItem('token');
         return { query: gql`${query}`, variables, parseResponse };
     };
 };

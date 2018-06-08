@@ -41,8 +41,8 @@ const sanitizeResource = (introspectionResults, resource) => data => {
                     : undefined,
                 [field.name]: linkedResourceData
                     ? sanitizeResource(introspectionResults, linkedResource)(
-                          data[field.name]
-                      )
+                        data[field.name]
+                    )
                     : undefined,
             };
         }
@@ -59,6 +59,8 @@ export default introspectionResults => (aorFetchType, resource) => response => {
     //gorm错误信息处理
     if (data.data && data.data.errors && data.data.errors.length)
         throw new Error(data.data.errors.map(e => e.message))
+    if (data.data && data.data.error)
+        throw new Error(data.data.error)
 
     if (
         aorFetchType === GET_LIST ||
