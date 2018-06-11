@@ -8,9 +8,9 @@ function login(params) {
   const shaObj = new jsSHA("SHA-256", "TEXT");
   shaObj.update(password);
 
-  return apolloClient.query({
-    query: gql`
-    query login {
+  return apolloClient.mutate({
+    mutation: gql`
+    mutation login {
       login(username:"${username}",password:"${shaObj.getHash("HEX")}"){
         success
         error
@@ -29,9 +29,9 @@ function login(params) {
     });
 }
 function logout(token) {
-  return apolloClient.query({
-    query: gql`
-    query login {
+  return apolloClient.mutate({
+    mutation: gql`
+    mutation logout {
       logout(token:"${token}"){
         success
         error
@@ -45,15 +45,22 @@ export default (type, params) => {
     case AUTH_LOGIN:
       return login(params);
     case AUTH_LOGOUT:
-      const token = localStorage.getItem('role')
-      //logout(token)
-      localStorage.removeItem('token');
+      const oldToken = localStorage.getItem('token');
+      if (oldToken) {
+        logout(oldToken)
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+      }
       return Promise.resolve();
     case AUTH_CHECK:
-      return localStorage.getItem('token') ? Promise.resolve() : Promise.reject();
+      const token = localStorage.getItem('token')
+      return token ? Promise.resolve() : Promise.reject();
     case AUTH_GET_PERMISSIONS:
       const role = localStorage.getItem('role');
       return role ? Promise.resolve(role) : Promise.reject();
+    case AUTH_ERROR:
+      // TODO: 错误处理
+      console.log(AUTH_ERROR, params);
     default:
       return Promise.reject('Unkown method');
   }
