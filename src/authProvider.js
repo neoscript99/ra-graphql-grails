@@ -3,6 +3,7 @@ import { AUTH_LOGIN, AUTH_LOGOUT, AUTH_CHECK, AUTH_GET_PERMISSIONS, AUTH_ERROR }
 import { apolloClient } from './dataProvider'
 import gql from 'graphql-tag';
 import jsSHA from 'jssha'
+
 function login(params) {
   const { username, password } = params;
   const shaObj = new jsSHA("SHA-256", "TEXT");
@@ -28,6 +29,7 @@ function login(params) {
         throw new Error(login.error);
     });
 }
+
 function logout(token) {
   return apolloClient.mutate({
     mutation: gql`
@@ -40,7 +42,8 @@ function logout(token) {
   `,
   })
 }
-export default (type, params) => {
+
+function auth(type, params) {
   switch (type) {
     case AUTH_LOGIN:
       return login(params);
@@ -57,11 +60,13 @@ export default (type, params) => {
       return token ? Promise.resolve() : Promise.reject();
     case AUTH_GET_PERMISSIONS:
       const role = localStorage.getItem('role');
-      return role ? Promise.resolve(role) : Promise.reject();
+      return role ? Promise.resolve() : Promise.reject();
     case AUTH_ERROR:
-      // TODO: 错误处理
-      console.log(AUTH_ERROR, params);
+      //如果是token问题，需重新登录，否则返回resolve
+      return params.graphQLErrors.some(error => error.errorCode === 'TokenError') ? Promise.reject() : Promise.resolve();
     default:
-      return Promise.reject('Unkown method');
+      return Promise.reject(`Unkown type: $(type)`);
   }
 }
+
+export default auth;
